@@ -5,19 +5,19 @@ import "google/protobuf/timestamp.proto";
 
 message Test {
   enum Type {
-    TYPE_NONE    = 0;
-    TYPE_FIRST     = 1;
+    TYPE_NONE = 0;
+    TYPE_FIRST = 1;
   }
-  google.protobuf.Timestamp at      = 1 [(gogoproto.stdtime) = true, (gogoproto.nullable) = false];
+  google.protobuf.Timestamp at = 1 [(gogoproto.stdtime) = true, (gogoproto.nullable) = false];
   Type type = 2;
   Inner inner = 3;
 }
 
 message Inner {
   enum Type {
-    TYPE_NONE    = 0;
-    TYPE_FIRST     = 1;
+    TYPE_NONE = 0;
+    TYPE_FIRST = 1;
   }
-  google.protobuf.Timestamp at      = 1 [(gogoproto.stdtime) = true, (gogoproto.nullable) = false];
+  google.protobuf.Timestamp at = 1 [(gogoproto.stdtime) = true, (gogoproto.nullable) = false];
   Type type = 2;
 }
