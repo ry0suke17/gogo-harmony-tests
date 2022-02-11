@@ -10,6 +10,7 @@ message Test {
   }
   google.protobuf.Timestamp at      = 1 [(gogoproto.stdtime) = true, (gogoproto.nullable) = false];
   Type type = 2;
+  Inner inner = 3;
 }
 
 message Inner {
