@@ -6,7 +6,7 @@ import "google/protobuf/timestamp.proto";
 message Test {
   enum Type {
     TYPE_NONE    = 0;
-    TYPE_WEB     = 1;
+    TYPE_FIRST     = 1;
   }
   google.protobuf.Timestamp at      = 1 [(gogoproto.stdtime) = true, (gogoproto.nullable) = false];
   Type type = 2;
@@ -16,7 +16,7 @@ message Test {
 message Inner {
   enum Type {
     TYPE_NONE    = 0;
-    TYPE_WEB     = 1;
+    TYPE_FIRST     = 1;
   }
   google.protobuf.Timestamp at      = 1 [(gogoproto.stdtime) = true, (gogoproto.nullable) = false];
   Type type = 2;
