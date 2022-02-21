@@ -1,6 +1,10 @@
-dev/isntall/dep:
+dev/dep/install:
 	git clone https://github.com/gogo/protobuf.git -b v1.3.2 ./third_party/github.com/gogo/protobuf
 	rm -rf ./third_party/github.com/gogo/protobuf/.git
+	git clone https://github.com/grpc-ecosystem/grpc-gateway.git -b v1.16.0 ./third_party/github.com/grpc-ecosystem/grpc-gateway
+	rm -rf ./third_party/github.com/grpc-ecosystem/grpc-gateway/.git
+	cd ./third_party/github.com/grpc-ecosystem/grpc-gateway/protoc-gen-grpc-gateway && go install ./... && cd -
+	cd ./third_party/github.com/grpc-ecosystem/grpc-gateway/protoc-gen-swagger && go install ./... && cd -
 	curl -OL https://github.com/protocolbuffers/protobuf/releases/download/v3.19.4/protoc-3.19.4-osx-x86_64.zip
 	unzip protoc-3.19.4-osx-x86_64.zip -d third_party/protoc-3.19.4-osx-x86_64/
 	rm -rf protoc-3.19.4-osx-x86_64.zip
