@@ -1,15 +1,20 @@
 package gogo_harmony_tests
 
 import (
+	"log"
+	"strings"
 	"testing"
 	"time"
 
+	gogojsonpb "github.com/gogo/protobuf/jsonpb"
+	"github.com/golang/protobuf/jsonpb"
 	goproto "github.com/golang/protobuf/proto"
 	"github.com/golang/protobuf/ptypes"
-	gotest "github.com/ry0suke17/gogo-harmony-tests/proto/go"
-	gogotest "github.com/ry0suke17/gogo-harmony-tests/proto/gogofaster"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+
+	gotest "github.com/ry0suke17/gogo-harmony-tests/proto/go"
+	gogotest "github.com/ry0suke17/gogo-harmony-tests/proto/gogofaster"
 )
 
 func Test_GoGoFasterToGo(t *testing.T) {
@@ -107,4 +112,88 @@ func assertGoGoTestEqual(
 	assert.Equal(t, expected.Type, actual.Type)
 	assert.Equal(t, expected.Inner.At, actual.Inner.At)
 	assert.Equal(t, expected.Inner.Type, actual.Inner.Type)
+}
+
+func Test_JSONPB_GoToGo(t *testing.T) {
+	marshaller := jsonpb.Marshaler{
+		EmitDefaults: true,  // Render fields with zero values
+		OrigName:     false, // Using camelCase for JSON
+		EnumsAsInts:  true,  // Whether to render enum values as integers, as opposed to string values.
+	}
+	unmarshaler := jsonpb.Unmarshaler{}
+
+	g := &gotest.Test{
+		At: nil,
+	}
+	j, err := marshaller.MarshalToString(g)
+	assert.NoError(t, err)
+	log.Println(j)
+
+	gTest := gotest.Test{}
+	err = unmarshaler.Unmarshal(strings.NewReader(j), &gTest)
+	assert.NoError(t, err)
+	log.Println(gTest.At)
+}
+
+func Test_JSONPB_GoGoToGoGo(t *testing.T) {
+	marshaller := gogojsonpb.Marshaler{
+		EmitDefaults: true,  // Render fields with zero values
+		OrigName:     false, // Using camelCase for JSON
+		EnumsAsInts:  true,  // Whether to render enum values as integers, as opposed to string values.
+	}
+	unmarshaler := gogojsonpb.Unmarshaler{}
+
+	g := &gogotest.Test{
+		At: time.Time{},
+	}
+	j, err := marshaller.MarshalToString(g)
+	assert.NoError(t, err)
+	log.Println(j)
+
+	gTest := gogotest.Test{}
+	err = unmarshaler.Unmarshal(strings.NewReader(j), &gTest)
+	assert.NoError(t, err)
+	log.Println(gTest.At)
+}
+
+func Test_JSONPB_GoGoToGo(t *testing.T) {
+	marshaller := gogojsonpb.Marshaler{
+		EmitDefaults: true,  // Render fields with zero values
+		OrigName:     false, // Using camelCase for JSON
+		EnumsAsInts:  true,  // Whether to render enum values as integers, as opposed to string values.
+	}
+	unmarshaler := jsonpb.Unmarshaler{}
+
+	g := &gogotest.Test{
+		At: time.Time{},
+	}
+	j, err := marshaller.MarshalToString(g)
+	assert.NoError(t, err)
+	log.Println(j)
+
+	gTest := gotest.Test{}
+	err = unmarshaler.Unmarshal(strings.NewReader(j), &gTest)
+	assert.NoError(t, err)
+	log.Println(gTest.At.AsTime())
+}
+
+func Test_JSONPB_GoToGoGo(t *testing.T) {
+	marshaller := jsonpb.Marshaler{
+		EmitDefaults: true,  // Render fields with zero values
+		OrigName:     false, // Using camelCase for JSON
+		EnumsAsInts:  true,  // Whether to render enum values as integers, as opposed to string values.
+	}
+	unmarshaler := gogojsonpb.Unmarshaler{}
+
+	g := &gotest.Test{
+		At: nil,
+	}
+
+	j, err := marshaller.MarshalToString(g)
+	assert.NoError(t, err)
+	log.Println(j)
+	ggTest2 := gogotest.Test{}
+	err = unmarshaler.Unmarshal(strings.NewReader(j), &ggTest2)
+	assert.NoError(t, err)
+	log.Println(ggTest2.At)
 }

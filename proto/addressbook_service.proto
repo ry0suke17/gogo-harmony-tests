@@ -1,12 +1,7 @@
 syntax = "proto3";
 
 import "github.com/gogo/protobuf/gogoproto/gogo.proto";
-import "github.com/grpc-ecosystem/grpc-gateway/protoc-gen-swagger/options/annotations.proto";
-import "github.com/grpc-ecosystem/grpc-gateway/third_party/googleapis/google/api/annotations.proto";
-import "github.com/grpc-ecosystem/grpc-gateway/third_party/googleapis/google/api/http.proto";
 import "google/protobuf/timestamp.proto";
-
-option (gogoproto.goproto_registration) = true;
 
 message Person {
   string name = 1;
@@ -40,10 +35,6 @@ message ListAddressBookResponse {
   repeated AddressBook address_books = 1;
 }
 
-service GatewayService {
-  rpc ListAddressBook(ListAddressBookRequest) returns (ListAddressBookResponse) {
-    option (google.api.http) = {
-      get: "/v1/admin/operation_configs"
-    };
-  }
+service AddressBookService {
+  rpc ListAddressBook(ListAddressBookRequest) returns (ListAddressBookResponse) {}
 }
