@@ -12,6 +12,7 @@ import (
 	"github.com/golang/protobuf/ptypes"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+	"google.golang.org/protobuf/types/known/timestamppb"
 
 	gotest "github.com/ry0suke17/gogo-harmony-tests/proto/go"
 	gogotest "github.com/ry0suke17/gogo-harmony-tests/proto/gogofaster"
@@ -114,86 +115,77 @@ func assertGoGoTestEqual(
 	assert.Equal(t, expected.Inner.Type, actual.Inner.Type)
 }
 
-func Test_JSONPB_GoToGo(t *testing.T) {
-	marshaller := jsonpb.Marshaler{
+var (
+	marshallerG = jsonpb.Marshaler{
 		EmitDefaults: true,  // Render fields with zero values
 		OrigName:     false, // Using camelCase for JSON
 		EnumsAsInts:  true,  // Whether to render enum values as integers, as opposed to string values.
 	}
-	unmarshaler := jsonpb.Unmarshaler{}
+	unmarshalerG = jsonpb.Unmarshaler{}
 
-	g := &gotest.Test{
-		At: nil,
+	marshallerGG = gogojsonpb.Marshaler{
+		EmitDefaults: true,  // Render fields with zero values
+		OrigName:     false, // Using camelCase for JSON
+		EnumsAsInts:  true,  // Whether to render enum values as integers, as opposed to string values.
 	}
-	j, err := marshaller.MarshalToString(g)
+	unmarshalerGG = gogojsonpb.Unmarshaler{}
+)
+
+func Test_JSONPB_GoToGo(t *testing.T) {
+	marshalG := &gotest.Test{
+		At: timestamppb.Now(),
+	}
+	j, err := marshallerG.MarshalToString(marshalG)
 	assert.NoError(t, err)
 	log.Println(j)
 
-	gTest := gotest.Test{}
-	err = unmarshaler.Unmarshal(strings.NewReader(j), &gTest)
+	unmarshalG := &gotest.Test{}
+	err = unmarshalerG.Unmarshal(strings.NewReader(j), unmarshalG)
 	assert.NoError(t, err)
-	log.Println(gTest.At)
+	log.Println(unmarshalG.At)
+	assert.Equal(t, marshalG.At, unmarshalG.At)
 }
 
 func Test_JSONPB_GoGoToGoGo(t *testing.T) {
-	marshaller := gogojsonpb.Marshaler{
-		EmitDefaults: true,  // Render fields with zero values
-		OrigName:     false, // Using camelCase for JSON
-		EnumsAsInts:  true,  // Whether to render enum values as integers, as opposed to string values.
+	marshalGG := &gogotest.Test{
+		At: time.Now().UTC(),
 	}
-	unmarshaler := gogojsonpb.Unmarshaler{}
-
-	g := &gogotest.Test{
-		At: time.Time{},
-	}
-	j, err := marshaller.MarshalToString(g)
+	j, err := marshallerGG.MarshalToString(marshalGG)
 	assert.NoError(t, err)
 	log.Println(j)
 
-	gTest := gogotest.Test{}
-	err = unmarshaler.Unmarshal(strings.NewReader(j), &gTest)
+	unmarshalGG := &gogotest.Test{}
+	err = unmarshalerGG.Unmarshal(strings.NewReader(j), unmarshalGG)
 	assert.NoError(t, err)
-	log.Println(gTest.At)
+	log.Println(unmarshalGG.At)
+	assert.Equal(t, marshalGG.At, unmarshalGG.At)
 }
 
 func Test_JSONPB_GoGoToGo(t *testing.T) {
-	marshaller := gogojsonpb.Marshaler{
-		EmitDefaults: true,  // Render fields with zero values
-		OrigName:     false, // Using camelCase for JSON
-		EnumsAsInts:  true,  // Whether to render enum values as integers, as opposed to string values.
+	marshalGG := &gogotest.Test{
+		At: time.Now().UTC(),
 	}
-	unmarshaler := jsonpb.Unmarshaler{}
-
-	g := &gogotest.Test{
-		At: time.Time{},
-	}
-	j, err := marshaller.MarshalToString(g)
+	j, err := marshallerGG.MarshalToString(marshalGG)
 	assert.NoError(t, err)
 	log.Println(j)
 
-	gTest := gotest.Test{}
-	err = unmarshaler.Unmarshal(strings.NewReader(j), &gTest)
+	unmarshalG := &gotest.Test{}
+	err = unmarshalerG.Unmarshal(strings.NewReader(j), unmarshalG)
 	assert.NoError(t, err)
-	log.Println(gTest.At.AsTime())
+	log.Println(unmarshalG.At.AsTime())
+	assert.Equal(t, marshalGG.At, unmarshalG.At.AsTime())
 }
 
 func Test_JSONPB_GoToGoGo(t *testing.T) {
-	marshaller := jsonpb.Marshaler{
-		EmitDefaults: true,  // Render fields with zero values
-		OrigName:     false, // Using camelCase for JSON
-		EnumsAsInts:  true,  // Whether to render enum values as integers, as opposed to string values.
-	}
-	unmarshaler := gogojsonpb.Unmarshaler{}
-
-	g := &gotest.Test{
+	marshalG := &gotest.Test{
 		At: nil,
 	}
 
-	j, err := marshaller.MarshalToString(g)
+	j, err := marshallerG.MarshalToString(marshalG)
 	assert.NoError(t, err)
 	log.Println(j)
-	ggTest2 := gogotest.Test{}
-	err = unmarshaler.Unmarshal(strings.NewReader(j), &ggTest2)
-	assert.NoError(t, err)
-	log.Println(ggTest2.At)
+
+	unmarshalGG := &gogotest.Test{}
+	err = unmarshalerGG.Unmarshal(strings.NewReader(j), unmarshalGG)
+	assert.Error(t, err) // bad Timestamp: parsing time "" as "2006-01-02T15:04:05.999999999Z07:00": cannot parse "" as "2006"
 }
