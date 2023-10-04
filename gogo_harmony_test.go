@@ -1,6 +1,7 @@
 package gogo_harmony_tests
 
 import (
+	"encoding/json"
 	"log"
 	"strings"
 	"testing"
@@ -188,4 +189,61 @@ func Test_JSONPB_GoToGoGo(t *testing.T) {
 	unmarshalGG := &gogotest.Test{}
 	err = unmarshalerGG.Unmarshal(strings.NewReader(j), unmarshalGG)
 	assert.Error(t, err) // bad Timestamp: parsing time "" as "2006-01-02T15:04:05.999999999Z07:00": cannot parse "" as "2006"
+}
+
+func Test_JSON_GoToGo(t *testing.T) {
+	marshalG := &gotest.Test{
+		At: timestamppb.Now(),
+	}
+	j, err := json.Marshal(marshalG)
+	assert.NoError(t, err)
+	log.Println(string(j))
+
+	unmarshalG := &gotest.Test{}
+	err = json.Unmarshal(j, unmarshalG)
+	assert.NoError(t, err)
+	log.Println(unmarshalG.At)
+	assert.Equal(t, marshalG.At.AsTime(), unmarshalG.At.AsTime())
+}
+
+func Test_JSON_GoGoToGoGo(t *testing.T) {
+	marshalGG := &gogotest.Test{
+		At: time.Now().UTC(),
+	}
+	j, err := json.Marshal(marshalGG)
+	assert.NoError(t, err)
+	log.Println(string(j))
+
+	unmarshalGG := &gogotest.Test{}
+	err = json.Unmarshal(j, unmarshalGG)
+	assert.NoError(t, err)
+	log.Println(unmarshalGG.At)
+	assert.Equal(t, marshalGG.At, unmarshalGG.At)
+}
+
+func Test_JSON_GoGoToGo(t *testing.T) {
+	marshalGG := &gogotest.Test{
+		At: time.Now().UTC(),
+	}
+	j, err := json.Marshal(marshalGG)
+	assert.NoError(t, err)
+	log.Println(string(j))
+
+	unmarshalG := &gotest.Test{}
+	err = json.Unmarshal(j, unmarshalG)
+	assert.Error(t, err) // json: cannot unmarshal string into Go struct field Test.at of type timestamppb.Timestamp
+}
+
+func Test_JSON_GoToGoGo(t *testing.T) {
+	marshalG := &gotest.Test{
+		At: timestamppb.Now(),
+	}
+
+	j, err := json.Marshal(marshalG)
+	assert.NoError(t, err)
+	log.Println(string(j))
+
+	unmarshalGG := &gogotest.Test{}
+	err = json.Unmarshal(j, unmarshalGG)
+	assert.Error(t, err) // parsing time "{\"seconds\":1696413080,\"nanos\":983043000}" as "\"2006-01-02T15:04:05Z07:00\"": cannot parse "{\"seconds\":1696413080,\"nanos\":983043000}" as "\""
 }
