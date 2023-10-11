@@ -1,6 +1,7 @@
 package gogo_harmony_tests
 
 import (
+	"bytes"
 	"encoding/json"
 	"log"
 	"strings"
@@ -134,7 +135,7 @@ var (
 
 func Test_JSONPB_GoToGo(t *testing.T) {
 	marshalG := &gotest.Test{
-		At: timestamppb.Now(),
+		At: nil,
 	}
 	j, err := marshallerG.MarshalToString(marshalG)
 	assert.NoError(t, err)
@@ -164,7 +165,7 @@ func Test_JSONPB_GoGoToGoGo(t *testing.T) {
 
 func Test_JSONPB_GoGoToGo(t *testing.T) {
 	marshalGG := &gogotest.Test{
-		At: time.Now().UTC(),
+		At: time.Time{},
 	}
 	j, err := marshallerGG.MarshalToString(marshalGG)
 	assert.NoError(t, err)
@@ -246,4 +247,58 @@ func Test_JSON_GoToGoGo(t *testing.T) {
 	unmarshalGG := &gogotest.Test{}
 	err = json.Unmarshal(j, unmarshalGG)
 	assert.Error(t, err) // parsing time "{\"seconds\":1696413080,\"nanos\":983043000}" as "\"2006-01-02T15:04:05Z07:00\"": cannot parse "{\"seconds\":1696413080,\"nanos\":983043000}" as "\""
+}
+
+func Test_JSONPBToJSONPB(t *testing.T) {
+	at := timestamppb.Now()
+	marshalG := &gotest.Test{
+		At:        nil,
+		CreatedAt: at,
+	}
+
+	j, err := marshallerG.MarshalToString(marshalG)
+	assert.NoError(t, err)
+	log.Printf("json: %s", j)
+
+	unmarshalG := &gotest.Test{}
+	err = unmarshalerG.Unmarshal(strings.NewReader(j), unmarshalG)
+	assert.NoError(t, err)
+	log.Printf("at: %s", unmarshalG.At)
+	log.Printf("cratedAt: %s", unmarshalG.CreatedAt)
+}
+
+func Test_JSONToJSONPB(t *testing.T) {
+	at := time.Now()
+	marshalGG := &gogotest.Test{
+		At:        time.Time{},
+		CreatedAt: at,
+	}
+
+	j, err := json.Marshal(marshalGG)
+	assert.NoError(t, err)
+	log.Printf("json: %s", j)
+
+	unmarshalG := &gotest.Test{}
+	err = unmarshalerG.Unmarshal(bytes.NewReader(j), unmarshalG)
+	assert.NoError(t, err)
+	log.Printf("at: %s", unmarshalG.At)
+	log.Printf("at as time: %s", unmarshalG.At.AsTime())
+	log.Printf("cratedAt: %s", unmarshalG.CreatedAt)
+}
+
+func Test_JSONPBToJSON(t *testing.T) {
+	marshalG := &gotest.Test{
+		At:        nil,
+		CreatedAt: timestamppb.Now(),
+	}
+
+	j, err := marshallerG.MarshalToString(marshalG)
+	assert.NoError(t, err)
+	log.Printf("json: %s", j)
+
+	unmarshalGG := &gogotest.Test{}
+	json.Unmarshal([]byte(j), unmarshalGG)
+	assert.NoError(t, err)
+	log.Printf("at: %s", unmarshalGG.At)
+	log.Printf("cratedAt: %s", unmarshalGG.CreatedAt)
 }
