@@ -264,6 +264,7 @@ func Test_JSONPBToJSONPB(t *testing.T) {
 	err = unmarshalerG.Unmarshal(strings.NewReader(j), unmarshalG)
 	assert.NoError(t, err)
 	log.Printf("at: %s", unmarshalG.At)
+	log.Printf("at as time: %s", unmarshalG.At.AsTime())
 	log.Printf("cratedAt: %s", unmarshalG.CreatedAt)
 }
 
